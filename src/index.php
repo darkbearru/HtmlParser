@@ -3,9 +3,12 @@
 $loader = require __DIR__ . '/../vendor/autoload.php';
 
 
-use Abramenko\HtmlParser\Parser\Repository\UrlRepository;
+use Abramenko\HtmlParser\Parser\HtmlParser;
+use \Abramenko\HtmlParser\Parser\Repository\UrlRepository;
 
 
-echo '<pre>';
-print_r(UrlRepository::getContent('https://abram-and-co.ru?here=херня'));
-echo '</pre>';
+$htmlParser =
+    HtmlParser::create(
+        UrlRepository::create('https://abram-and-co.ru?here=херня')->get()
+    )->parse();
+
