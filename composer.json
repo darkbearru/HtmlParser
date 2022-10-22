@@ -2,12 +2,14 @@
     "name": "a_abramenko/html-parser",
     "description": "HtmlParser Test work for A3F Group",
     "type": "project",
+    "license": "MIT",
+    "keywords": ["Html Parser", "PHP"],
     "require-dev": {
         "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
-            "AAbramenko\\HtmlParser\\": "src/"
+            "Abramenko\\HtmlParser\\": "src/"
         }
     },
     "authors": [
