@@ -9,6 +9,6 @@ use \Abramenko\HtmlParser\Parser\Repository\UrlRepository;
 
 $htmlParser =
     HtmlParser::create(
-        UrlRepository::create('https://faitid.org')->get()
+        UrlRepository::create('https://blackfire.io/login')->get()
 )->parse();
 

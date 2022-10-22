@@ -5,30 +5,25 @@ namespace Abramenko\HtmlParser\Parser;
 use Abramenko\HtmlParser\Parser\Tags\Tag;
 use Abramenko\HtmlParser\Parser\Tags\TagType;
 
-final class HtmlParser extends AbstractParser
+final class HtmlParser implements InterfaceParser
 {
-    private array $noneClosedTags = [];
+    private array $htmlTree = [];
+
+    public function __construct(private string $htmlData) {
+    }
+
+    public function getData(): array {
+        return $this->htmlTree;
+    }
 
     /**
      * Инициализация класса, передача сущностей для чтения данных
      * А также запуск обработки
      * @param string $htmlData
-     * @return AbstractParser
+     * @return self
      */
-    public static function create(string $htmlData): AbstractParser {
-        $htmlData = preg_replace('/(^\s+|\r|\n|\s+$)/uim', '', $htmlData);
-        $htmlData = preg_replace('/<!--.*?-->/uism', '', $htmlData);
-        $htmlData = preg_replace('~(<script.*?>).*?(</script>)~uism', '', $htmlData);
+    public static function create(string $htmlData): self {
         return new self($htmlData);
-    }
-
-    /**
-     * Добавление сервиса по обработке данных
-     * @return $this
-     */
-    public function addService(): self {
-        // TODO: Implement addService() method.
-        return $this;
     }
 
     /**
@@ -36,16 +31,8 @@ final class HtmlParser extends AbstractParser
      * @return $this
      */
     public function parse(): self {
-        // Логика следующая, ищем тэг, а также ищем следующий тэг
-        // ЕСли первый тег закрывающийся, тогда смотрим не закрывает ли его следующий тэг
-        // 1. Закрывает, то создаём тег с текстовым контентом, и переходим далее
-        // 2. Если следующий другой тег, проверяем не является ли текущий тег само закрывающимся
-        // Если является, то создаем тег и переходим далее
-        // Если нет, то все следующие теги считаем вложением
+        $this->htmlData = $this->cleanUpHtml($this->htmlData);
         $this->htmlTree = $this->parseHtml($this->htmlData, null);
-
-        $this->visualise ($this->htmlTree);
-
         return $this;
     }
 
@@ -112,6 +99,11 @@ final class HtmlParser extends AbstractParser
         return null;
     }
 
+    /**
+     * Получаем из строки аттрибуты и разбиваем их на имя, значение
+     * @param string $attributes
+     * @return array
+     */
     protected function getAttributes(string $attributes): array {
         $result = [];
         $list = preg_split('~\s+\b~ui', $attributes);
@@ -126,16 +118,17 @@ final class HtmlParser extends AbstractParser
         return $result;
     }
 
-    protected function visualise(array $array) {
-        echo '<ul>';
-        foreach ($array as $item) {
-            echo '<li>';
-            echo '<b>'.$item->getName().'</b>';
-            if(!empty($item->getChildren())) {
-                $this->visualise($item->getChildren());
-            }
-            echo '</li>';
-        }
-        echo '</ul>';
+    /**
+     * Чистим html, поскольку всё-таки цели не было сделать тру-парсер,
+     * позволяем себе некие вольности, в виде убирания лишних пробелов,
+     * комментариев и избавляемся от тела js
+     * @param string $htmlData
+     * @return string
+     */
+    private function cleanUpHtml(string $htmlData) : string {
+        $htmlData = preg_replace('/(^\s+|\r|\n|\s+$)/uim', '', $htmlData);
+        $htmlData = preg_replace('/<!--.*?-->/uism', '', $htmlData);
+        return preg_replace('~(<script.*?</script>)~uism', '<script></script>', $htmlData);
     }
+
 }
