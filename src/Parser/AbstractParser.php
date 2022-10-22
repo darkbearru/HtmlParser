@@ -6,6 +6,7 @@ use Abramenko\HtmlParser\Parser\Repository\UrlRepository;
 
 abstract class AbstractParser
 {
+    protected array $htmlTree = [];
 
     protected function __construct (
         protected string $htmlData,
@@ -32,11 +33,5 @@ abstract class AbstractParser
      * @return AbstractParser
      */
     abstract public function parse(): self;
-
-    /**
-     * Получение данных по тэгу
-     * @return void
-     */
-    abstract protected function getTag(): void;
 
 }

@@ -18,5 +18,7 @@
             "email": "a.abramenko@chita.ru"
         }
     ],
-    "require": {}
+    "require": {
+      "ext-mbstring": "*"
+    }
 }
