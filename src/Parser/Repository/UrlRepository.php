@@ -4,12 +4,13 @@ namespace Abramenko\HtmlParser\Parser\Repository;
 
 class UrlRepository implements InterfaceRepository
 {
-    private static UrlRepository $instance;
+    public function __construct(private readonly string $url) {
+    }
 
-    public function get(string $url): ?string {
+    public function get(): ?string {
         try {
             return file_get_contents(
-                $this->guardUrl($url)
+                $this->guardUrl($this->url)
             );
         } catch (\Exception $exception) {
             echo "Can't read url";
@@ -17,9 +18,8 @@ class UrlRepository implements InterfaceRepository
         return null;
     }
 
-    public static function getContent(string $url): ?string {
-        self::$instance = new UrlRepository();
-        return self::$instance->get($url);
+    public static function create(string $url): self {
+        return new self($url);
     }
 
     private function guardUrl(string $url): string {

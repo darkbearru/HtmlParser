@@ -4,5 +4,6 @@ namespace Abramenko\HtmlParser\Parser\Repository;
 
 interface InterfaceRepository
 {
-    public function get (string $url) : ?string;
+    function __construct(string $url);
+    public function get () : ?string;
 }
