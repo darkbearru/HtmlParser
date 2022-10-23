@@ -2,6 +2,7 @@
 
 namespace Abramenko\HtmlParser\Parser;
 
+use Abramenko\HtmlParser\Parser\Tags\Attributes\Attribute;
 use Abramenko\HtmlParser\Parser\Tags\Tag;
 use Abramenko\HtmlParser\Parser\Tags\TagType;
 
@@ -17,16 +18,6 @@ final class HtmlParser implements InterfaceParser
     }
 
     /**
-     * Инициализация класса, передача сущностей для чтения данных
-     * А также запуск обработки
-     * @param string $htmlData
-     * @return self
-     */
-    public static function create(string $htmlData): self {
-        return new self($htmlData);
-    }
-
-    /**
      * Начало обработки
      * @return $this
      */
@@ -34,6 +25,19 @@ final class HtmlParser implements InterfaceParser
         $this->htmlData = $this->cleanUpHtml($this->htmlData);
         $this->htmlTree = $this->parseHtml($this->htmlData, null);
         return $this;
+    }
+
+    /**
+     * Чистим html, поскольку всё-таки цели не было сделать тру-парсер,
+     * позволяем себе некие вольности, в виде убирания лишних пробелов,
+     * комментариев и избавляемся от тела js
+     * @param string $htmlData
+     * @return string
+     */
+    private function cleanUpHtml(string $htmlData): string {
+        $htmlData = preg_replace('/(^\s+|\r|\n|\s+$)/uim', '', $htmlData);
+        $htmlData = preg_replace('/<!--.*?-->/uism', '', $htmlData);
+        return preg_replace('~(<script.*?</script>)~uism', '<script></script>', $htmlData);
     }
 
     /**
@@ -53,14 +57,14 @@ final class HtmlParser implements InterfaceParser
                 return $result;
             }
 
-            $tag = Tag::create($firstTag->tagName, $firstTag->attributes, '');
+            $tag = Tag::create($firstTag->tagName, self::parseAttributes($firstTag->attributes), '');
 
             if (!$firstTag->isSelfClosedTag) {
                 if ($firstTag->tagName === $nextTag->tagName && $firstTag->needToClose && !$firstTag->isClosingTag) {
                     // Вариант когда следующий тег сразу же является закрывающимся
                     $tag->setContent($nextTag->content);
                     $html = mb_substr($html, $nextTag->offset - $firstTag->offset, null, 'utf-8');
-                }else if ($firstTag->needToClose) {
+                } else if ($firstTag->needToClose) {
                     $ret = $this->parseHtml($html, $tag);
                     $tag->setChildren($ret);
                 }
@@ -120,16 +124,22 @@ final class HtmlParser implements InterfaceParser
     }
 
     /**
-     * Чистим html, поскольку всё-таки цели не было сделать тру-парсер,
-     * позволяем себе некие вольности, в виде убирания лишних пробелов,
-     * комментариев и избавляемся от тела js
+     * Инициализация класса, передача сущностей для чтения данных
+     * А также запуск обработки
      * @param string $htmlData
-     * @return string
+     * @return self
      */
-    private function cleanUpHtml(string $htmlData) : string {
-        $htmlData = preg_replace('/(^\s+|\r|\n|\s+$)/uim', '', $htmlData);
-        $htmlData = preg_replace('/<!--.*?-->/uism', '', $htmlData);
-        return preg_replace('~(<script.*?</script>)~uism', '<script></script>', $htmlData);
+    public static function create(string $htmlData): self {
+        return new self($htmlData);
+    }
+
+    public static function parseAttributes(array $attributes): array {
+        $result = [];
+        foreach ($attributes as $attribute) {
+            $item = Attribute::get($attribute);
+            $result[$item->getName()] = $item;
+        }
+        return $result;
     }
 
 }
