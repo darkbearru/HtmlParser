@@ -11,9 +11,10 @@ final class Tag implements InterfaceTag
     public function __construct(
         private readonly string $tagName,
         private readonly ?array $attributes,
-        private ?string $textContent,
-        private readonly bool $noneClosed = false
-    ) {}
+        private ?string         $textContent,
+        private readonly bool   $noneClosed = false
+    ) {
+    }
 
     /**
      * Нам дана строка, вытаскиваем из неё первый тег, и возвращаем остатки строки
@@ -28,7 +29,7 @@ final class Tag implements InterfaceTag
     }
 
     public function getAttribute(string $name): ?Attribute {
-        if(!empty($this->attributes[$name])) return $this->attributes[$name];
+        if (!empty($this->attributes[$name])) return $this->attributes[$name];
         return null;
     }
 
@@ -36,17 +37,18 @@ final class Tag implements InterfaceTag
         return $this->attributes;
     }
 
-    public function getChildren() : array {
+    public function getChildren(): array {
         return $this->children;
+    }
+
+    public function setChildren(array $children) {
+        $this->children = $children;
     }
 
     public function getName(): string {
         return $this->tagName;
     }
 
-    public function setChildren(array $children) {
-        $this->children = $children;
-    }
     public function setContent(string $content) {
         $this->textContent = $content;
     }
@@ -58,5 +60,4 @@ final class Tag implements InterfaceTag
     public function isNoneClosed(): bool {
         return $this->noneClosed;
     }
-
 }
