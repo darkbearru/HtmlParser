@@ -55,14 +55,15 @@ final class HtmlParser implements InterfaceParser
 
             $tag = Tag::create($firstTag->tagName, $firstTag->attributes, '');
 
-            if ($firstTag->tagName === $nextTag->tagName) {
-                // Вариант когда следующий тег сразу же является закрывающимся
-                $tag->setContent($nextTag->content);
-                $html = mb_substr($html, $nextTag->offset - $firstTag->offset, null, 'utf-8');
-
-            }else if ($firstTag->needToClose && !$firstTag->isSelfClosedTag && !$firstTag->isClosingTag) {
-                $ret = $this->parseHtml($html, $tag);
-                $tag->setChildren($ret);
+            if (!$firstTag->isSelfClosedTag) {
+                if ($firstTag->tagName === $nextTag->tagName && $firstTag->needToClose && !$firstTag->isClosingTag) {
+                    // Вариант когда следующий тег сразу же является закрывающимся
+                    $tag->setContent($nextTag->content);
+                    $html = mb_substr($html, $nextTag->offset - $firstTag->offset, null, 'utf-8');
+                }else if ($firstTag->needToClose) {
+                    $ret = $this->parseHtml($html, $tag);
+                    $tag->setChildren($ret);
+                }
             }
 
             $result[] = $tag;

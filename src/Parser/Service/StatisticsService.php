@@ -2,6 +2,7 @@
 
 namespace Abramenko\HtmlParser\Parser\Service;
 
+use Abramenko\HtmlParser\Parser\Display\Display;
 use Abramenko\HtmlParser\Parser\InterfaceParser;
 use Abramenko\HtmlParser\Parser\Tags\InterfaceTag;
 
@@ -9,30 +10,34 @@ class StatisticsService implements InterfaceService
 {
     private array $statistics = [];
 
-    private function __construct(private readonly ?InterfaceService $handler) {
+    private function __construct(private readonly string $nameService, private readonly ?InterfaceService $handler) {
 
     }
 
-    public static function create(?InterfaceService $handler): InterfaceService {
-        return new self($handler);
+    public static function create(string $nameService, ?InterfaceService $handler): InterfaceService {
+        return new self($nameService, $handler);
     }
 
     public function display(): InterfaceService {
-        echo '<h3>Кол-во тегов:</h3>';
-        echo '<pre>';
-        print_r ($this->statistics);
-        echo '</pre>';
+        Display::create($this->nameService, $this->statistics)->show();
         if(!empty($this->handler)) return $this->handler->display();
         return $this;
     }
 
-    public function action(mixed $dataItem, int $deep = 0, int $itemIndex = 0): InterfaceService {
+    public function actionByItem(mixed $dataItem): InterfaceService {
         if ($dataItem instanceof InterfaceTag) {
             $this->tagStatistics($dataItem);
         }
         // Если имеется указатель на следующий сервис, вызываем его
         if(!empty($this->handler)) {
-            return $this->handler->action($dataItem, $deep, $itemIndex);
+            return $this->handler->actionByItem($dataItem);
+        }
+        return $this;
+    }
+
+    public function actionByAll(array $dataItems): InterfaceService {
+        if(!empty($this->handler)) {
+            return $this->handler->actionByAll($dataItems);
         }
         return $this;
     }

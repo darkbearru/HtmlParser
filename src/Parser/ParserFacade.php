@@ -14,27 +14,28 @@ final class ParserFacade
     }
 
     public function run(): self {
-        $this->processData($this->interfaceParser->getData());
+        $data = $this->interfaceParser->getData();
+        $this->processData($data);
+        $this->interfaceService->actionByAll($data);
         return $this;
     }
 
-    public function display() : self {
+    public function display(): self {
         $this->interfaceService->display();
         return $this;
     }
 
-    public function getService() : InterfaceService {
-        return  $this->interfaceService;
+    public function getService(): InterfaceService {
+        return $this->interfaceService;
     }
 
-    private function processData(array $tagsList, int $deep = 0): void {
-        $count = count($tagsList);
+    private function processData(array $tagsList): void {
         foreach ($tagsList as $index => $tag) {
-            $this->interfaceService->action($tag, $deep, $index !== $count ? $index : -1);
             $children = $tag->getChildren();
             if (!empty($children)) {
-                $this->processData($children, $deep + 1);
+                $this->processData($children);
             }
+            $this->interfaceService->actionByItem($tag);
         }
     }
 }

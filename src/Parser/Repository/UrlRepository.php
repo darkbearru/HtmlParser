@@ -9,9 +9,9 @@ class UrlRepository implements InterfaceRepository
 
     public function get(): ?string {
         try {
-            return file_get_contents(
+            return (file_get_contents(
                 $this->guardUrl($this->url)
-            );
+            ));
         } catch (\Exception $exception) {
             echo "Can't read url";
         }
