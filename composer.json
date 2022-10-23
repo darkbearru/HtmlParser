@@ -1,0 +1,22 @@
+{
+    "name": "a_abramenko/html-parser",
+    "description": "HtmlParser Test work for A3F Group",
+    "type": "project",
+    "license": "MIT",
+    "keywords": ["Html Parser", "PHP"],
+    "autoload": {
+        "psr-4": {
+            "Abramenko\\HtmlParser\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Alexey Abramenko",
+            "email": "a.abramenko@chita.ru"
+        }
+    ],
+    "require": {
+      "ext-mbstring": "*",
+        "symfony/var-dumper": "^6.1"
+    }
+}
